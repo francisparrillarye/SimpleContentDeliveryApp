@@ -1,0 +1,30 @@
+ApplicationClient.java
+    client requests video from HisCinemaServer using a number(1-5) by calling webserver(2)-->request video 2
+    client asks local DNS to resolve video.hiscinema.com/F2
+    client asks HerCDN for file F2
+    client starts receiving F2 and stores it as herCDNMovie.mp4
+
+HisCinemaServer.java
+    HisCinemaServer parses index.html and returns the line that corresponds with number requested by client
+        -->returns video.hiscinema.com/F2
+
+Local.java
+    local DNS sends to request HisDns to resolve video.hiscinema.com/F2
+    local DNS receives url of video and then sends herDns a request to resolve herCDN.com/F2
+    local DNS sends client the IP addrress HerDns sent
+
+HisDns.java
+    his cinema finds record of video.hiscinema.com/F2 and replies herCDN.com/F2
+
+HerDns.java
+    herDns receives request and finds IP adrress of HerCDN that has the video herCDN.com/F2
+    and then sends the IP addrress where the video is stored
+HerCDN.java
+    HerCDN receives request for F2 and starts streaming the file to client
+index.html
+    contents:
+        video.hiscinema.com/F1
+        video.hiscinema.com/F2
+        video.hiscinema.com/F3
+        video.hiscinema.com/F4
+        video.hiscinema.com/F5

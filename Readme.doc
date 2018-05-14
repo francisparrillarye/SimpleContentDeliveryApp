@@ -1,0 +1,34 @@
+How to run and compile
+    -set up IP Adrresses for Local DNS, HisCinemaServer/HisDns, HerDns/HerCDN
+    -ports are already set so no need to change them
+    -compile each file in each server: javac ApplicationClient
+    -then run each created class: java ApplicationClient
+    -ApplicationClient should be run last since it will trigger the request to corresponding servers
+        -Client->HisCinemaServer->Client->Local DNS->HisDns->Local DNS->HerDns->Local DNS->Client->HerCDN->Client
+
+Source Code Description
+    -IP Addresses for HisCinemaServer and local DNS are set as the client needs to send requests to them
+    -Client calls the getVideoURL() with the number video the client wants
+    -getVideoURL() creates a socket to connect to HisCinemaServer and sends a GET request for index.html along with the video number it wants
+    -client then waits for a reply, the url of the video, from HisCinemaServer
+    -the port numberused to create a socket by the client should be the same used by HisCinemaServer to create a server socket
+    -HisCinemaServer parses the received message and gets the second part of the message, requested index.html file, by splitting 
+    the message by spaces " "
+    -if HisCinemaServer cant find the file, it will send a 404 error to the client
+    -otherwise it parses index.html gets the line in the file that the client requested
+    -HisCinemaServer then sends the line in the file using a DataOutputStream and the socket created as the parameter
+    -once the client receives the url, it will send the url as a datagrampacket to the local DNS to get the IP of the url
+    -the local DNS will have a UDP port waiting to get a request from the client
+    -it uses three lists, name, value, and type, to store records for HerCDN anf HisCinemaServer DNSs
+    -it will use the record to forward, the request from the client to HisCinemaServer's DNS
+    -HisDns, will also have records of video urls and the places the videos are hosted in, HerCDN server
+    -HisDns will respond to the local DNS with the value in the list that matches the name of the url, url of the video in HerCDN
+    -local DNS will again use the records of DNS' it has to get the IP of the of the HerCDN url sent by HisDns
+    -HerDns will have a record with type CN and A for each video HerCDN has, www.hercdn.COM.F2 and herCDN.com/F2, both having the same IP
+    -HerDns will send the IP value that matches the name the local DNS wants to resolve
+    -the local DNS will then forward the IP for the video file to the client
+    -once the IP Address for herCDN is resolved, the client can now request the video from herCDN
+    -the client open two sockets to send the request and to wait for the response of herCDN
+    -herCDN has a list of movies it has in its server, which ever video number the client wants, 
+    herCDN will stream the file on the list to the client
+    -client will then wait until the whole file is downloaded before closing the connection

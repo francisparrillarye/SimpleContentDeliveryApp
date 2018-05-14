@@ -1,0 +1,4 @@
+outputting contents of test file....
+hello
+there
+world
